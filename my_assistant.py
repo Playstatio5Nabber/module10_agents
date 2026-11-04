@@ -2,16 +2,12 @@
 
 # Define an assistant that uses a separate loan tool.
 class LoanAssistant:
-    # Receive the name, factual instructions, calculation tool, and model.
-    def __init__(self, name, instructions, loan_tool, model):
+    # Receive the assistant's name and calculation tool.
+    def __init__(self, name, loan_tool):
         # Store the name for greetings and printed replies.
         self.name = name
         # Store the tool instead of putting calculations in the assistant.
         self.loan_tool = loan_tool
-        # Store the factual instructions for general model questions.
-        self.instructions = instructions
-        # Store the interchangeable model supplied by the caller.
-        self.model = model
         # Create a separate conversation history for this assistant.
         self.history = []
 
@@ -42,14 +38,13 @@ class LoanAssistant:
         if parts and parts[0] == "loan":
             # Pass the words to the calculation reply method.
             return self.loan_reply(parts)
-        # Send messages outside the calculation and handoff rules to the model.
-        reply = self.model.reply(self.instructions, self.history)
-        # Detect an unavailable model before returning its answer.
-        if reply is None:
-            # Give a safe retry message without inventing lending information.
-            return "Sorry, I can't answer that right now. Please try again in a moment."
-        # Return the model answer when one is available.
-        return reply
+        # Recognize a greeting.
+        if "hello" in text:
+            # Introduce the assistant and show the command format.
+            return f"Hello! I'm {self.name}. Try: loan 10000 6 36"
+        # Give a helpful response for unsupported requests.
+        return "I can't help with that request. Try: loan 10000 6 36"
+        # Read the loan command and use the calculation tool.
 
     def loan_reply(self, parts):
         # Require the command plus exactly three values.
