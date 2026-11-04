@@ -1,11 +1,13 @@
 import pytest
 
+from mock_model import MockModel
 from my_assistant import LoanAssistant
 from my_tool import LoanCalculator
+from tests.test_chatbot import SilentModel
 
 
 def make_assistant():
-    return LoanAssistant("Penny", LoanCalculator())
+    return LoanAssistant("Penny", "Be friendly.", LoanCalculator(), MockModel())
 
 
 def test_tool_calculates_interest_payment():
@@ -42,9 +44,26 @@ def test_invalid_numbers_get_help():
 
 def test_unknown_request_gets_safe_reply():
     bot = make_assistant()
-    assert "can't help" in bot.respond("What is the weather?")
+    assert "not sure" in bot.respond("What is the weather?")
 
 
 def test_approval_request_goes_to_person():
     bot = make_assistant()
+    assert "loan officer" in bot.respond("Can you approve my loan?")
+
+
+def test_general_message_goes_to_model():
+    assert make_assistant().respond("hello") == "Hello! How can I help you today?"
+
+
+def test_model_unavailable_gets_safe_reply():
+    bot = make_assistant()
+    bot.model = SilentModel()
+    assert "try again" in bot.respond("hello")
+
+
+def test_calculation_and_handoff_work_without_model():
+    bot = make_assistant()
+    bot.model = SilentModel()
+    assert "$304.22" in bot.respond("loan 10000 6 36")
     assert "loan officer" in bot.respond("Can you approve my loan?")

@@ -1,6 +1,7 @@
 # Author: Sami Ali
 
 from chatbot import SupportChatbot
+from mock_model import MockModel
 from order_tool import OrderLookup
 from stock_tool import StockLookup
 
@@ -8,12 +9,15 @@ from stock_tool import StockLookup
 order_tool = OrderLookup({"A100": "shipped"})
 stock_tool = StockLookup({"rain jacket": 12})
 
+model = MockModel()
+
 # Create two separate chatbot objects with the same tools.
 sunny = SupportChatbot(
     "Sunny",
     "You are cheerful and brief.",
     order_tool,
     stock_tool,
+    model,
 )
 
 river = SupportChatbot(
@@ -21,6 +25,7 @@ river = SupportChatbot(
     "You are formal and detailed.",
     order_tool,
     stock_tool,
+    model,
 )
 
 # Give Sunny two turns and River one turn.
