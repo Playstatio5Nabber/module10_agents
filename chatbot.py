@@ -1,114 +1,113 @@
 # chatbot.py
 # Author: Sami Ali
-HANDOFF_WORDS = ["address", "payment", "card"]
+
+# Store HANDOFF_WORDS for the following checks or operations.
+HANDOFF_WORDS = ["payment", "card"]
+# Store MAX_TOOL_ROUNDS for the following checks or operations.
+MAX_TOOL_ROUNDS = 3
 
 
-# Define a chatbot that combines rules, tools, and a model.
+# Define SupportChatbot to keep this responsibility in a separate object.
 class SupportChatbot:
-    """A support chatbot. Rules handle what must be right. A model handles the rest."""
+    """A support chatbot. The model decides. The toolbox checks every tool request."""
 
-    # Receive the chatbot's settings, tools, and model.
-    def __init__(self, name, instructions, order_tool, stock_tool, model):
-        # Store the chatbot's display name.
+    # Define __init__ so this operation can be called and tested separately.
+    def __init__(self, name, instructions, tools, model):
+        """Set up one chatbot with its own name, instructions, tools, model, and history."""
+        # Store self.name for the following checks or operations.
         self.name = name
-        # Store the instructions supplied to the model.
+        # Store self.instructions for the following checks or operations.
         self.instructions = instructions
-        # Store the tool used to look up orders.
-        self.order_tool = order_tool
-        # Store the tool used to check stock.
-        self.stock_tool = stock_tool
-        # Store the model used for other questions.
+        # Store self.tools for the following checks or operations.
+        self.tools = tools
+        # Store self.model for the following checks or operations.
         self.model = model
-        # Start an independent conversation history.
+        # Store self.history for the following checks or operations.
         self.history = []
 
-    # Handle one customer message and record both sides.
+    # Define respond so this operation can be called and tested separately.
     def respond(self, user_message):
-        # Record the customer message before choosing a reply.
+        """Record the user's message, choose a reply, record it, and return it."""
+        # Run self.history.append({'role': 'user', 'content': user_message}) to perform this step.
         self.history.append({"role": "user", "content": user_message})
-        # Choose a response using rules first.
+        # Store reply for the following checks or operations.
         reply = self.choose_reply(user_message)
-        # Record the assistant's reply for future model calls.
+        # Run self.history.append({'role': 'assistant', 'content': reply}) to perform this step.
         self.history.append({"role": "assistant", "content": reply})
-        # Give the response back to the calling program.
+        # Return reply to the caller.
         return reply
 
-    # Apply handoff and tool rules before asking the model.
+    # Define choose_reply so this operation can be called and tested separately.
     def choose_reply(self, user_message):
-        # Ignore capitalization when checking keywords.
-        text = user_message.lower()
-        # Check sensitive topics before all other requests.
-        if self.needs_human(text):
-            # Return the fixed handoff response.
+        """Pass payment questions to a person. Send everything else to the model."""
+        # Check self.needs_human(user_message.lower()) before continuing.
+        if self.needs_human(user_message.lower()):
+            # Return "I can't help with that here. I'm passing you to a human agent." to the caller.
             return "I can't help with that here. I'm passing you to a human agent."
-        # Recognize an order question.
-        if "order" in text:
-            # Use the order tool instead of the model.
-            return self.order_reply(user_message)
-        # Recognize a stock question.
-        if "stock" in text:
-            # Use the stock tool instead of the model.
-            return self.stock_reply(user_message)
-        # Send all remaining messages to the model.
+        # Return self.model_reply() to the caller.
         return self.model_reply()
 
-    # Ask the model and handle its no-answer signal.
-    def model_reply(self):
-        # Send the instructions and recorded conversation.
-        reply = self.model.reply(self.instructions, self.history)
-        # Check whether the model could not provide an answer.
-        if reply is None:
-            # Give a safe fallback instead of inventing information.
-            return "Sorry, I can't answer that right now. Please try again in a moment."
-        # Return the answer supplied by the model.
-        return reply
-
-    # Determine whether a human must handle this request.
+    # Define needs_human so this operation can be called and tested separately.
     def needs_human(self, text):
-        # Check each configured sensitive keyword.
+        """Return True if the message is about something a person must handle."""
+        # Inspect each word in HANDOFF_WORDS.
         for word in HANDOFF_WORDS:
-            # Look for this keyword in the customer's message.
+            # Check word in text before continuing.
             if word in text:
-                # Signal that a human is needed.
+                # Return True to the caller.
                 return True
-        # Signal that no handoff keyword matched.
+        # Return False to the caller.
         return False
 
-    # Build an order response from stored order data.
-    def order_reply(self, user_message):
-        # Ask the tool to identify an order in the message.
-        order_id = self.order_tool.find_order_id(user_message)
-        # Check whether the tool found no recognized order ID.
-        if order_id is None:
-            # Ask for an order ID rather than guessing.
-            return "Which order? Please send an order ID like A100."
-        # Look up the status using the order tool.
-        status = self.order_tool.find_status(order_id)
-        # Return the status in the required wording.
-        return f"Order {order_id} is {status}."
+    # Define model_reply so this operation can be called and tested separately.
+    def model_reply(self):
+        """Ask the model. Run each tool it asks for, then ask again, up to a limit."""
+        # Store rounds for the following checks or operations.
+        rounds = 0
+        # Repeat while rounds < MAX_TOOL_ROUNDS, keeping the loop bounded.
+        while rounds < MAX_TOOL_ROUNDS:
+            # Store tool_list for the following checks or operations.
+            tool_list = self.tools.tool_list()
+            # Store decision for the following checks or operations.
+            decision = self.model.decide(self.instructions, self.history, tool_list)
+            # Check decision is None before continuing.
+            if decision is None:
+                # Return "Sorry, I can't answer that right now. Please try again in a moment." to the caller.
+                return "Sorry, I can't answer that right now. Please try again in a moment."
+            # Check 'text' in decision before continuing.
+            if "text" in decision:
+                # Return decision['text'] to the caller.
+                return decision["text"]
+            # Store name for the following checks or operations.
+            name = decision["tool"]
+            # Store arguments for the following checks or operations.
+            arguments = decision["arguments"]
+            # Store result for the following checks or operations.
+            result = self.tools.run(name, arguments, self.history)
+            # Run self.history.append({'role': 'tool', 'tool_name': name, 'arguments': arguments, 'content...
+            self.history.append(
+                {
+                    "role": "tool",
+                    "tool_name": name,
+                    "arguments": arguments,
+                    "content": result,
+                }
+            )
+            # Update rounds after this step.
+            rounds += 1
+        # Return "Sorry, I couldn't finish that. I'm passing you to a human agent." to the caller.
+        return "Sorry, I couldn't finish that. I'm passing you to a human agent."
 
-    # Count customer messages in this chatbot's history.
+    # Define count_user_messages so this operation can be called and tested separately.
     def count_user_messages(self):
-        # Begin the count at zero.
+        """Return how many messages the user has sent so far."""
+        # Store count for the following checks or operations.
         count = 0
-        # Examine every recorded message.
+        # Inspect each message in self.history.
         for message in self.history:
-            # Count only messages from the customer.
+            # Check message['role'] == 'user' before continuing.
             if message["role"] == "user":
-                # Add one for this customer message.
+                # Update count after this step.
                 count += 1
-        # Return the completed count.
+        # Return count to the caller.
         return count
-
-    # Build a stock response from stored inventory data.
-    def stock_reply(self, user_message):
-        # Ask the stock tool to identify the product.
-        product = self.stock_tool.find_product(user_message)
-        # Check whether no recognized product was found.
-        if product is None:
-            # Ask the customer to identify the product.
-            return "Which product? Please name the item you want me to check."
-        # Get the inventory count from the stock tool.
-        count = self.stock_tool.count_for(product)
-        # Return the count in the required wording.
-        return f"We have {count} of the {product} in stock."
