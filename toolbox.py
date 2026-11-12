@@ -89,12 +89,8 @@ class Toolbox:
 
     # Define customer_said so this operation can be called and tested separately.
     def customer_said(self, history, text):
-        """Return True if text appears in a message the customer typed."""
-        # Inspect each message in history.
+        """Check customer-provided details."""
         for message in history:
-            # Check message['role'] == 'user' and text.lower() in message['content'].lower() before contin...
             if message["role"] == "user" and text.lower() in message["content"].lower():
-                # Return True to the caller.
                 return True
-        # Return False to the caller.
         return False

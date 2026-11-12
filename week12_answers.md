@@ -9,13 +9,11 @@
 ## Exercise 2
 Added check_return to OrderLookup, registered it in tool_list, and added the checked routing branch in Toolbox.run. Tests cover delivered and undelivered orders, missing and unknown IDs, an ID the customer never supplied, and a FakeModel choosing the tool. The sample data has no delivery dates, so this tool states the 30-day return rule rather than claiming to verify an actual delivery age.
 
-## Exercise 3 — live model observation pending
-No real Ollama conversation was run in this environment. Do not treat the assignment's example as an observed result.
-
-To finish: temporarily add `return True` immediately below the customer_said docstring in toolbox.py, run main.py with Ollama available, type "I want to change my shipping address", then quit and reject any request at staff review. Paste the actual conversation here. Remove the temporary line afterward and rerun the checks. The prepared code keeps the guardrail enabled.
+## Exercise 3 — live model observation
+I temporarily disabled customer_said by adding return True before its checks. I typed "I want to change my shipping address", and Sunny asked for the order ID instead of inventing one. In this run, the model requested missing information even with the guardrail disabled. This does not guarantee that other runs will behave safely, so I removed the temporary line afterward. All 37 tests passed with the guardrail restored.
 
 ## Exercise 4
 FallbackModel asks its primary model first and only uses its backup if the primary returns None. main.py now wraps OllamaModel with KeywordModel as the backup. The automated test uses SilentModel to verify the greeting and order lookup without a running Ollama server.
 
 ## Validation
-37 tests passed in a separate Python environment without an Ollama server. A live Ollama conversation, the guardrail-off observation, and the mini-project's live model observations are still pending. No commit, push, or Canvas submission has been made.
+All 37 tests passed on my Mac after restoring the guardrail. In the live support conversation, the A102 address change waited for staff review and was applied after approval. Penny calculated a $304.22 monthly payment, queued the car estimate for review, and saved it after approval. In a fresh conversation, Penny asked for the missing annual rate and correctly referred a qualification question to a loan officer. With Ollama unavailable, the backup model successfully looked up order A100. The initial code was pushed in commit 4256500; these observations still need to be committed and pushed. Canvas has not been submitted.

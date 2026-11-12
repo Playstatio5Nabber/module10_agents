@@ -1,26 +1,13 @@
-# Lab 12 work status
+# Lab 12 validation
 
-Prepared with AI assistance. LAB12_AI_OUTPUT.md contains the Python output; comments explain the code. Review it and be able to explain it before submission.
+- All 37 tests passed on my Mac after restoring the guardrail.
+- The live support run queued the A102 address change and applied it after staff approval.
+- Penny calculated $304.22 and saved the car estimate only after staff approval.
+- Penny requested the missing annual rate and handed qualification questions to a loan officer.
+- With the guardrail temporarily disabled, Sunny asked for an order ID in the observed run.
+- The temporary bypass was removed.
+- The fallback looked up order A100 with Ollama unavailable.
+- Initial code was pushed in commit 4256500; final observations need another commit.
+- Canvas has not been submitted.
 
-## Completed checks
-- Customer-provided IDs and addresses are checked before support tools run.
-- Address changes wait for staff and cannot be applied twice.
-- check_return is registered and tested.
-- FallbackModel keeps simple lookups working without the real model.
-- The loan mini-project uses model-chosen tools and a checked toolbox.
-- Saving a fictional loan estimate waits for staff review. This is not loan approval.
-- Automated tests run without a real model.
-
-## Live work remaining
-Run main.py and my_main.py with Ollama and granite4.1:3b on a machine that supports it. Complete Exercise 3 with the real model, reject the request, restore the guardrail, and record the actual output in week12_answers.md. Add your actual mini-project observations to README.md. If using a classmate's machine, record their name as the assignment requires.
-
-## Final local checks
-From the repository root, with Ollama stopped:
-
-```sh
-ruff format .
-ruff check .
-pytest -v
-```
-
-These prepared files passed 37 tests and Ruff in a separate environment; the complete repository also needs its final check after the edited files are saved. Commits, pushes, and Canvas submission were deliberately left to Sami.
+AI assistance is documented in LAB12_AI_OUTPUT.md.

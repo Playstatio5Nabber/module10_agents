@@ -120,7 +120,6 @@ class SupportChatbot:
         count = self.stock_tool.count_for(product)
         # Return the count in the required wording.
         return f"We have {count} of the {product} in stock."
-
 ```
 
 
@@ -146,7 +145,6 @@ class MockModel:
             return "Hello! How can I help you today?"
         # Return a fixed fallback for every other message.
         return "I'm not sure how to help with that. I can check an order or stock."
-
 ```
 
 
@@ -188,7 +186,6 @@ class OllamaModel:
             return None
         # Return the model's reply text.
         return response.message.content
-
 ```
 
 
@@ -205,7 +202,6 @@ class EchoModel:
     def reply(self, instructions, history):
         # Prefix the last message's content with "You said: ".
         return "You said: " + history[-1]["content"]
-
 ```
 
 
@@ -303,7 +299,6 @@ class LoanAssistant:
         return (
             f"Estimated monthly payment: ${payment:.2f} (principal and interest only)."
         )
-
 ```
 
 
@@ -431,7 +426,6 @@ def test_echo_model_repeats_the_last_message():
     stock_tool = StockLookup({"rain jacket": 12})
     bot = SupportChatbot("Sunny", "Be friendly.", order_tool, stock_tool, EchoModel())
     assert bot.respond("good morning") == "You said: good morning"
-
 ```
 
 
@@ -509,5 +503,4 @@ def test_rules_work_without_model():
     bot = LoanAssistant("Penny", "Be friendly.", LoanCalculator(), SilentModel())
     assert "$304.22" in bot.respond("loan 10000 6 36")
     assert "loan officer" in bot.respond("Can you approve my loan?")
-
 ```
